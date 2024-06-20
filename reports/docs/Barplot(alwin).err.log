@@ -1,0 +1,109 @@
+Traceback (most recent call last):
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/yorben/miniconda3/envs/jupyterbook/lib/python3.10/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+df1 = pd.read_csv('DATASETS/aaa_published_games.csv')
+df1 = df1[['name', 'price']]
+df2 = pd.read_csv('DATASETS/indie_published_games.csv')
+df2 = df2[['name', 'price']]
+df3 = pd.read_csv('DATASETS/player_count.csv')
+df1 = df1.merge(df3, how='inner', on='name')
+df2 = df2.merge(df3, how='inner', on='name')
+df1['Type of game']='AAA'
+df2['Type of game']='Indie'
+df = df1.merge(df2, how='outer')
+df = df.drop(columns=['Unnamed: 5'])
+
+AAA = df[df["Type of game"]=='AAA']
+AAA.loc[:, 'Current'] = pd.to_numeric(AAA['Current'], errors='coerce')
+AAA.loc[:, '24th Peak'] = pd.to_numeric(AAA['24th Peak'], errors='coerce')
+AAA.loc[:, 'All_time peak'] = pd.to_numeric(AAA['All_time peak'], errors='coerce')
+AAA_price_categories = pd.qcut(AAA["price"], 3, retbins=True, labels=["Low", "Medium", "High"])
+AAA['price_category'] = AAA_price_categories[0]
+
+AAA_low = AAA[AAA["price_category"]=="Low"]
+AAA_current_low = AAA_low['Current'].mean() 
+AAA_24th_low = AAA_low['24th Peak'].mean()
+AAA_all_time_low = AAA_low['All_time peak'].mean()
+
+AAA_medium = AAA[AAA["price_category"]=="Medium"]
+AAA_current_medium = AAA_medium['Current'].mean() 
+AAA_24th_medium = AAA_medium['24th Peak'].mean()
+AAA_all_time_medium = AAA_medium['All_time peak'].mean()
+
+AAA_high = AAA[AAA["price_category"]=="High"]
+AAA_current_high = AAA_high['Current'].mean() 
+AAA_24th_high = AAA_high['24th Peak'].mean()
+AAA_all_time_high = AAA_high['All_time peak'].mean()
+
+Indie = df[df["Type of game"]=='Indie']
+Indie.loc[:, 'Current'] = pd.to_numeric(Indie['Current'], errors='coerce')
+Indie.loc[:, '24th Peak'] = pd.to_numeric(Indie['24th Peak'], errors='coerce')
+Indie.loc[:, 'All_time peak'] = pd.to_numeric(Indie['All_time peak'], errors='coerce')
+Indie_price_categories = pd.qcut(Indie["price"], 3, retbins=True, labels=["Low", "Medium", "High"])
+Indie['price_category'] = Indie_price_categories[0]
+
+Indie_low = Indie[Indie["price_category"]=="Low"]
+Indie_current_low = Indie_low['Current'].mean() 
+Indie_24th_low = Indie_low['24th Peak'].mean()
+Indie_all_time_low = Indie_low['All_time peak'].mean()
+
+Indie_medium = Indie[Indie["price_category"]=="Medium"]
+Indie_current_medium = Indie_medium['Current'].mean() 
+Indie_24th_medium = Indie_medium['24th Peak'].mean()
+Indie_all_time_medium = Indie_medium['All_time peak'].mean()
+
+Indie_high = Indie[Indie["price_category"]=="High"]
+Indie_current_high = Indie_high['Current'].mean() 
+Indie_24th_high = Indie_high['24th Peak'].mean()
+Indie_all_time_high = Indie_high['All_time peak'].mean()
+
+data = [['AAA low price', AAA_current_low, AAA_24th_low, AAA_all_time_low], ['AAA medium price', AAA_current_medium, AAA_24th_medium, AAA_all_time_medium], ['AAA high price', AAA_current_high, AAA_24th_high, AAA_all_time_high], ['Indie low price', Indie_current_low, Indie_24th_low, Indie_all_time_low], ['Indie medium price', Indie_current_medium, Indie_24th_medium, Indie_all_time_medium], ['Indie high price', Indie_current_high, Indie_24th_high, Indie_all_time_high]]
+df = pd.DataFrame(data, columns=['Type of game', 'Current', '24th peak', 'All time peak'])
+
+trace =[
+    go.Bar(name='Current ', x = df['Type of game'], y = df['Current'], marker_color='rgb(102,194,165)'),
+    go.Bar(name='24th peak', x = df['Type of game'], y = df['24th peak'], marker_color='rgb(252,141,98)'),
+    go.Bar(name='All time peak', x = df['Type of game'], y = df['All time peak'], marker_color='rgb(141,160,203)'),
+]
+
+layout = go.Layout(
+    xaxis=go.layout.XAxis(
+        type='category'
+    ),
+    yaxis=go.layout.YAxis(
+    )
+)
+fig = go.Figure(data=trace, layout=layout)
+fig.update_layout(
+    title_text='Number of players, based on the type of game and price category.',
+    xaxis_title='Type of game',
+    yaxis_title='Number of players',
+    height=400
+)
+fig.show()
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[1], line 1[0m
+[0;32m----> 1[0m df1 [38;5;241m=[39m [43mpd[49m[38;5;241m.[39mread_csv([38;5;124m'[39m[38;5;124mDATASETS/aaa_published_games.csv[39m[38;5;124m'[39m)
+[1;32m      2[0m df1 [38;5;241m=[39m df1[[[38;5;124m'[39m[38;5;124mname[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mprice[39m[38;5;124m'[39m]]
+[1;32m      3[0m df2 [38;5;241m=[39m pd[38;5;241m.[39mread_csv([38;5;124m'[39m[38;5;124mDATASETS/indie_published_games.csv[39m[38;5;124m'[39m)
+
+[0;31mNameError[0m: name 'pd' is not defined
+
