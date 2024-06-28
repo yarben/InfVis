@@ -1,7 +1,7 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: Genes # Change this to your book title.
+title: Video games # Change this to your book title.
 author: Verborgen zeebewoners # Change this to your name (or your team/organization name).
 
 # Force re-execution of notebooks on each build.
